@@ -10,7 +10,8 @@ using System.Globalization;
 
 namespace Application.Events.IndividualEvents.Handlers
 {
-    public class IndividualEventCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, IClientService clientService) :
+    public class IndividualEventCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, IClientService clientService, ICoachService coachService,
+        ISportService sportService, IRoomService roomService) :
         IRequestHandler<CreateIndividualEventCommand, CreatedOrUpdatedEntityViewModel<Guid>>, IRequestHandler<AddClientToIndividualEventCommand>,
         IRequestHandler<DeleteClientFromIndividualEventCommand>
     {
@@ -22,35 +23,11 @@ namespace Application.Events.IndividualEvents.Handlers
                     "Только тренер может добавлять индивидуальные занятия!");
             }
 
-            var coach = await dbContext.Coachs
-                .Where(x => x.ExternalId == Guid.Parse(contextAccessor.IdentityUserId))
-                .SingleOrDefaultAsync(cancellationToken);
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
 
-            if (coach == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Тренер с внешним идентификатором \"{contextAccessor.IdentityUserId}\" не найден!");
-            }
+            var sport = await sportService.GetSportAsync(request.Body.SportId, cancellationToken);
 
-            var sport = await dbContext.Sports
-                .Where(x => x.Id == request.Body.SportId)
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (sport == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Спорт с идентификатором \"{request.Body.SportId}\" не найден!");
-            }
-
-            var room = await dbContext.Rooms
-                .Where(x => x.Id == request.Body.RoomId)
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (room == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Зал с идентификатором \"{request.Body.RoomId}\" не найден!");
-            }
+            var room = await roomService.GetRoomAsync(request.Body.RoomId, cancellationToken);
 
             var startDate = DateTime.ParseExact(request.Body.StartDate, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture).ToUniversalTime();
             var duration = TimeOnly.Parse(request.Body.Duration);

@@ -1,21 +1,19 @@
 ﻿using Abstractions.CommonModels;
+using Abstractions.Services;
 using Application.Clients;
 using Application.Clients.Commands;
 using Core.Exceptions;
 using Domain;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.Handlers
 {
-    internal class ClientCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, IClientMapper clientMapper) :
+    internal class ClientCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, IClientMapper clientMapper, IClientService clientService) :
         IRequestHandler<CreateClientCommand, CreatedOrUpdatedEntityViewModel<Guid>>
     {
         public async Task<CreatedOrUpdatedEntityViewModel<Guid>> Handle(CreateClientCommand request, CancellationToken cancellationToken)
         {
-            var clientWithSameId = await dbContext.Clients
-                .Where(x => x.ExternalId == Guid.Parse(contextAccessor.IdentityUserId))
-                .SingleOrDefaultAsync(cancellationToken);
+            var clientWithSameId = await clientService.GetClientAsync(contextAccessor.IdentityUserId, false, cancellationToken);
 
             if (clientWithSameId != null)
             {

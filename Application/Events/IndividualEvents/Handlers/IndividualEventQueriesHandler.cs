@@ -63,6 +63,9 @@ namespace Application.Events.IndividualEvents.Handlers
             var existingEvent = await dbContext.IndividualEvents
                 .AsNoTracking()
                 .Where(x => x.Id == request.IndividualEventId)
+                .Include(x => x.Sport)
+                .Include(x => x.Coach)
+                .Include(x => x.Room)
                 .SingleOrDefaultAsync(cancellationToken)
                 ?? throw new ObjectNotFoundException($"Индивидуальное занятие с идентификатором {request.IndividualEventId} не найдено!");
 

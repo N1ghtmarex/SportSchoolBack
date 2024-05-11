@@ -16,9 +16,7 @@ namespace Infrastructure.Domain.Services
 
             var clientId = Guid.Parse(id);
 
-            var clientQuery = dbContext.Clients
-                .AsNoTracking()
-                .Where(x => x.ExternalId == clientId);
+            var clientQuery = dbContext.Clients.Where(x => x.ExternalId == clientId);
 
             if (includeSection)
             {

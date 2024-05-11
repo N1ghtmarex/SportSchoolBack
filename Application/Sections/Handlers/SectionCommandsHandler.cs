@@ -1,4 +1,5 @@
 ﻿using Abstractions.CommonModels;
+using Abstractions.Services;
 using Application.Sections.Commands;
 using Core.Exceptions;
 using Domain;
@@ -8,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Sections.Handlers
 {
-    internal class SectionCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ISectionMapper sectionMapper) :
+    internal class SectionCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ISectionMapper sectionMapper, ICoachService coachService,
+        ISportService sportService, IRoomService roomService, IClientService clientService, ISectionService sectionService) :
         IRequestHandler<CreateSectionCommand, CreatedOrUpdatedEntityViewModel<Guid>>, IRequestHandler<AddClientToSectionCommand>, IRequestHandler<RemoveClientFromSectionCommand>,
         IRequestHandler<DeleteSectionCommand>
     {
@@ -22,15 +24,7 @@ namespace Application.Sections.Handlers
                     "Только тренер может добавлять секции!");
             }
 
-            var coach = await dbContext.Coachs
-                .Where(x => x.ExternalId == Guid.Parse(contextAccessor.IdentityUserId))
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (coach == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Тренер с внешним идентификатором \"{contextAccessor.IdentityUserId}\" не найден!");
-            }
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
 
             var sectionWithSameName = await dbContext.Sections
                 .Where(x => x.Name == request.Body.Name)
@@ -42,25 +36,9 @@ namespace Application.Sections.Handlers
                     $"Секция с названием \"{sectionWithSameName.Name}\" уже существует!");
             }
 
-            var sport = await dbContext.Sports
-                .Where(x => x.Id == request.Body.SportId)
-                .SingleOrDefaultAsync(cancellationToken);
+            var sport = await sportService.GetSportAsync(request.Body.SportId, cancellationToken);
 
-            if (sport == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Вид спорта с идентификатором \"{request.Body.SportId}\" не найден!");
-            }
-
-            var room = await dbContext.Rooms
-                .Where(x => x.Id == request.Body.RoomId)
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (room == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Зал с идентификатором \"{request.Body.RoomId}\" не найден!");
-            }
+            var room = await roomService.GetRoomAsync(request.Body.RoomId, cancellationToken);
 
             var sectionToCreate = sectionMapper.MapToEntity((request.Body, coach.Id));
             var createdSection = await dbContext.AddAsync(sectionToCreate, cancellationToken);
@@ -78,29 +56,9 @@ namespace Application.Sections.Handlers
 
         public async Task Handle(AddClientToSectionCommand request, CancellationToken cancellationToken)
         {
-            var client = await dbContext.Clients
-                .Where(x => x.ExternalId == Guid.Parse(contextAccessor.IdentityUserId))
-                .Include(x => x.Section)
-                .SingleOrDefaultAsync(cancellationToken);
+            var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
 
-            if (client == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Пользователь с внешним идентификатором {contextAccessor.IdentityUserId} не найден!");
-            }
-
-            var section = await dbContext.Sections
-                .Where(x => x.Id == request.Body.SectionId)
-                .Include(x => x.Sport)
-                .Include(x => x.Room)
-                .Include(x => x.Coach)
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (section == null) 
-            {
-                throw new ObjectNotFoundException(
-                    $"Секция с идентификатором {request.Body.SectionId} не найдена!");
-            }
+            var section = await sectionService.GetSectionAsync(request.Body.SectionId, true, true, true, cancellationToken);
 
             if (client.Section == null)
             {
@@ -119,10 +77,7 @@ namespace Application.Sections.Handlers
 
         public async Task Handle(RemoveClientFromSectionCommand request, CancellationToken cancellationToken)
         {
-            var client = await dbContext.Clients
-                .Where(x => x.ExternalId == Guid.Parse(contextAccessor.IdentityUserId))
-                .Include(x => x.Section)
-                .SingleOrDefaultAsync(cancellationToken);
+            var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
 
             if (client == null)
             {
@@ -130,18 +85,7 @@ namespace Application.Sections.Handlers
                     $"Пользователь с внешним идентификатором {contextAccessor.IdentityUserId} не найден!");
             }
 
-            var section = await dbContext.Sections
-                .Where(x => x.Id == request.Body.SectionId)
-                .Include(x => x.Sport)
-                .Include(x => x.Room)
-                .Include(x => x.Coach)
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (section == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Секция с идентификатором {request.Body.SectionId} не найдена!");
-            }
+            var section = await sectionService.GetSectionAsync(request.Body.SectionId, true, true, true, cancellationToken);
             
             if (client.Section == null) 
             {
@@ -166,28 +110,9 @@ namespace Application.Sections.Handlers
                     "Только тренер может добавлять секции!");
             }
 
-            var coach = await dbContext.Coachs
-                .Where(x => x.ExternalId == Guid.Parse(contextAccessor.IdentityUserId))
-                .SingleOrDefaultAsync(cancellationToken);
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
 
-            if (coach == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Тренер с внешним идентификатором \"{contextAccessor.IdentityUserId}\" не найден!");
-            }
-
-            var section = await dbContext.Sections
-                .Where(x => x.Id == request.SectionId)
-                .Include(x => x.Sport)
-                .Include(x => x.Room)
-                .Include(x => x.Coach)
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (section == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Секция с идентификатором {request.SectionId} не найдена!");
-            }
+            var section = await sectionService.GetSectionAsync(request.SectionId, true, true, true, cancellationToken);
 
             if (coach.Id != section.CoachId)
             {

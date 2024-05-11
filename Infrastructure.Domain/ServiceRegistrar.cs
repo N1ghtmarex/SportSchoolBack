@@ -13,6 +13,10 @@ public static class ServiceRegistrar
         var serviceProvider = services.BuildServiceProvider();
 
         services.AddTransient<IClientService, ClientService>();
+        services.AddTransient<ICoachService, CoachService>();
+        services.AddTransient<ISportService, SportService>();
+        services.AddTransient<IRoomService, RoomService>();
+        services.AddTransient<ISectionService, SectionService>();
 
         return services;
     }

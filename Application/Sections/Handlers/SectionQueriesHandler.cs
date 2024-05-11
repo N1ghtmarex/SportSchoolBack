@@ -1,4 +1,5 @@
 ﻿using Abstractions.CommonModels;
+using Abstractions.Services;
 using Application.Sections.Dtos;
 using Application.Sections.Queries;
 using Core.EntityFramework.Features.SearchPagination;
@@ -12,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Sections.Handlers
 {
-    internal class SectionQueriesHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ISectionMapper sectionMapper) :
+    internal class SectionQueriesHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ISectionMapper sectionMapper, IClientService clientService) :
         IRequestHandler<GetSectionsListQuery, PagedResult<SectionListViewModel>>, IRequestHandler<GetSectionQuery, SectionListViewModel>, 
         IRequestHandler<GetUserSectionsQuery, PagedResult<SectionListViewModel>>, IRequestHandler<IsClientInSectionQuery, bool>
     {
@@ -62,17 +63,7 @@ namespace Application.Sections.Handlers
 
         public async Task<PagedResult<SectionListViewModel>> Handle(GetUserSectionsQuery request, CancellationToken cancellationToken)
         {
-            var client = await dbContext.Clients
-                .AsNoTracking()
-                .Where(x => x.ExternalId == Guid.Parse(contextAccessor.IdentityUserId))
-                .Include(x => x.Section)
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (client == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Клиент с внешним идентификатором {contextAccessor.IdentityUserId} не найден!");
-            }
+            var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
 
             var sectionQuery = dbContext.Sections
                 .AsNoTracking()
@@ -93,17 +84,7 @@ namespace Application.Sections.Handlers
 
         public async Task<bool> Handle(IsClientInSectionQuery request, CancellationToken cancellationToken)
         {
-            var client = await dbContext.Clients
-                .AsNoTracking()
-                .Where(x => x.ExternalId == Guid.Parse(contextAccessor.IdentityUserId))
-                .Include(x => x.Section)
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (client == null)
-            {
-                throw new ObjectNotFoundException(
-                    $"Клиент с внешним идентификатором {contextAccessor.IdentityUserId} не найден!");
-            }
+            var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
 
             var section = await dbContext.Sections
                 .AsNoTracking()
