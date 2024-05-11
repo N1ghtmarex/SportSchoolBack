@@ -15,6 +15,12 @@ namespace SportSchool.Controllers
     [ApiExplorerSettings(GroupName = "sportschool")]
     public class SectionEventController(ISender sender) : BaseController
     {
+        /// <summary>
+        /// Добавить занятие секции
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<CreatedOrUpdatedEntityViewModel<Guid>> CreateSectionEvent([FromQuery] CreateSectionEventCommand command,
             CancellationToken cancellationToken)
@@ -22,6 +28,12 @@ namespace SportSchool.Controllers
             return await sender.Send(command, cancellationToken);
         }
 
+        /// <summary>
+        /// Получить список занятий всех секций
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<PagedResult<SectionEventListViewModel>> GetSectionEventsList(
             [FromQuery] GetSectionEventsListQuery query, CancellationToken cancellationToken)
@@ -29,6 +41,12 @@ namespace SportSchool.Controllers
             return await sender.Send(query, cancellationToken);
         }
 
+        /// <summary>
+        /// Получить список занятий конкретной секции
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet("{SectionId}")]
         public async Task<PagedResult<SectionEventListViewModel>> GetSectionEvent(
             [FromQuery] GetSectionEventQuery query, CancellationToken cancellationToken)

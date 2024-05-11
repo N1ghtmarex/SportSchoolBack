@@ -15,12 +15,24 @@ namespace SportSchool.Controllers;
 [ApiExplorerSettings(GroupName = "sportschool")]
 public class RoomController(ISender sender) : BaseController
 {
+    /// <summary>
+    /// Создать зал
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<CreatedOrUpdatedEntityViewModel<Guid>> CreateRoom([FromQuery] CreateRoomCommand command, CancellationToken cancellationToken)
     {
         return await sender.Send(command, cancellationToken);
     }
 
+    /// <summary>
+    /// Получить список залов
+    /// </summary>
+    /// <param name="query"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<PagedResult<RoomListViewModel>> GetRoomsListQuery(
         [FromQuery] GetRoomsListQuery query, CancellationToken cancellationToken)
