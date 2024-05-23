@@ -58,7 +58,7 @@ namespace Application.Sections.Handlers
         {
             var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
 
-            var section = await sectionService.GetSectionAsync(request.Body.SectionId, true, true, true, cancellationToken);
+            var section = await sectionService.GetSectionAsync(request.Body.SectionId, true, true, true, true, cancellationToken);
 
             if (client.Section == null)
             {
@@ -85,7 +85,7 @@ namespace Application.Sections.Handlers
                     $"Пользователь с внешним идентификатором {contextAccessor.IdentityUserId} не найден!");
             }
 
-            var section = await sectionService.GetSectionAsync(request.Body.SectionId, true, true, true, cancellationToken);
+            var section = await sectionService.GetSectionAsync(request.Body.SectionId, true, true, true, true, cancellationToken);
             
             if (client.Section == null) 
             {
@@ -112,7 +112,7 @@ namespace Application.Sections.Handlers
 
             var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
 
-            var section = await sectionService.GetSectionAsync(request.SectionId, true, true, true, cancellationToken);
+            var section = await sectionService.GetSectionAsync(request.SectionId, true, true, true, true, cancellationToken);
 
             if (coach.Id != section.CoachId)
             {

@@ -94,5 +94,26 @@ namespace SportSchool.Controllers
         {
             return await sender.Send(query, cancellationToken);
         }
+
+        /// <summary>
+        /// Есть ли пользователь на занятии
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet("is-entered/{IndividualEventId}")]
+        public async Task<ActionResult<bool>> IsUserInIndividualEvent([FromQuery] IsUserInIndividualEvent query,
+            CancellationToken cancellationToken)
+        {
+            return await sender.Send(query, cancellationToken);
+        }
+
+        [HttpDelete("delete/{EventId}")]
+        public async Task<ActionResult> DeleteEvent([FromQuery] DeleteIndividualEventCommand command,
+            CancellationToken cancellationToken)
+        {
+            await sender.Send(command, cancellationToken);
+            return Ok();
+        }
     }
 }

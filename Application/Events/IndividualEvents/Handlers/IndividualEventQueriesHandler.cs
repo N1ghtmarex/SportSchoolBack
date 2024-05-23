@@ -13,9 +13,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Application.Events.IndividualEvents.Handlers
 {
     internal class IndividualEventQueriesHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, IIndividualEventMapper individualEventMapper,
-        IClientService clientService) :
+        IClientService clientService, ICoachService coachService) :
         IRequestHandler<GetIndividualEventsListQuery, PagedResult<IndividualEventListViewModel>>, IRequestHandler<GetIndividualEventQuery, IndividualEventListViewModel>,
-        IRequestHandler<GetClientsIndividualEventsListQuery, PagedResult<IndividualEventListViewModel>>
+        IRequestHandler<GetClientsIndividualEventsListQuery, PagedResult<IndividualEventListViewModel>>, IRequestHandler<IsUserInIndividualEvent, bool>
     {
         public async Task<PagedResult<IndividualEventListViewModel>> Handle(GetIndividualEventsListQuery request, CancellationToken cancellationToken)
         {
@@ -29,6 +29,21 @@ namespace Application.Events.IndividualEvents.Handlers
             else if (request.Filter.ToLower() == "reserved")
             {
                 individualEventQuery = individualEventQuery.Where(x => x.ClientId != null);
+            }
+            else if (request.Filter.ToLower() == "my")
+            {
+                if (!contextAccessor.UserRoles.Contains("Coach"))
+                {
+                    var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, false, cancellationToken);
+
+                    individualEventQuery = individualEventQuery.Where(x => x.ClientId == client.Id);
+                }
+                else
+                {
+                    var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+
+                    individualEventQuery = individualEventQuery.Where(x => x.CoachId == coach.Id);
+                }
             }
             else if (request.Filter.ToLower() != "all")
             {
@@ -121,6 +136,44 @@ namespace Application.Events.IndividualEvents.Handlers
 
             var result = individualEventsList.Select(individualEventMapper.MapToListViewModel);
             return result.AsPagedResult(request, await individualEventQuery.CountAsync(cancellationToken));
+        }
+
+        public async Task<bool> Handle(IsUserInIndividualEvent request, CancellationToken cancellationToken)
+        {
+            var individualEvent = await dbContext.IndividualEvents
+                .Where(x => x.Id == request.IndividualEventId)
+                .SingleOrDefaultAsync(cancellationToken);
+
+            if (individualEvent == null)
+            {
+                throw new ObjectNotFoundException(
+                    $"Индидуальное событие с идентификатором \"{request.IndividualEventId}\" не найдено!");
+            }
+
+            if (!contextAccessor.UserRoles.Contains("Coach"))
+            {
+                var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, false, cancellationToken);
+
+                if (individualEvent.ClientId == client.Id)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+
+            if (individualEvent.CoachId == coach.Id)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

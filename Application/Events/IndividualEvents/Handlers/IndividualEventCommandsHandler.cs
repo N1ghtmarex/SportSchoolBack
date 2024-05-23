@@ -13,7 +13,7 @@ namespace Application.Events.IndividualEvents.Handlers
     public class IndividualEventCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, IClientService clientService, ICoachService coachService,
         ISportService sportService, IRoomService roomService) :
         IRequestHandler<CreateIndividualEventCommand, CreatedOrUpdatedEntityViewModel<Guid>>, IRequestHandler<AddClientToIndividualEventCommand>,
-        IRequestHandler<DeleteClientFromIndividualEventCommand>
+        IRequestHandler<DeleteClientFromIndividualEventCommand>, IRequestHandler<DeleteIndividualEventCommand>
     {
         public async Task<CreatedOrUpdatedEntityViewModel<Guid>> Handle(CreateIndividualEventCommand request, CancellationToken cancellationToken)
         {
@@ -110,6 +110,32 @@ namespace Application.Events.IndividualEvents.Handlers
 
             individualEvent.ClientId = null;
             await dbContext.SaveChangesAsync();
+        }
+
+        public async Task Handle(DeleteIndividualEventCommand request, CancellationToken cancellationToken)
+        {
+            var individualEvent = await dbContext.IndividualEvents
+                .Where(x => x.Id == request.EventId)
+                .SingleOrDefaultAsync(cancellationToken);
+
+            if (individualEvent == null)
+            {
+                throw new ObjectNotFoundException(
+                    $"Индивидуальное занятие с идентификатором {request.EventId} не найдено!");
+            }
+
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+
+            if (coach.Id == individualEvent.CoachId)
+            {
+                dbContext.Remove(individualEvent);
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            else
+            {
+                throw new BusinessLogicException(
+                    $"Вы не являетесь тренером данного занятия!");
+            }
         }
     }
 }

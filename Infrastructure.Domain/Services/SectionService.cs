@@ -10,7 +10,7 @@ namespace Infrastructure.Domain.Services
 {
     public class SectionService(ApplicationDbContext dbContext) : ISectionService
     {
-        public async Task<Section> GetSectionAsync(Guid id, bool includeSport, bool includeRoom, bool includeCoach, CancellationToken cancellationToken)
+        public async Task<Section> GetSectionAsync(Guid id, bool includeSport, bool includeRoom, bool includeCoach, bool includeClient, CancellationToken cancellationToken)
         {
             Defend.Against.Null(id, nameof(id));
 
@@ -29,6 +29,11 @@ namespace Infrastructure.Domain.Services
             if (includeCoach)
             {
                 sectionQuery = sectionQuery.Include(x => x.Coach);
+            }
+
+            if (includeClient)
+            {
+                sectionQuery = sectionQuery.Include(x => x.Client);
             }
 
             var section = await sectionQuery.SingleOrDefaultAsync(cancellationToken);

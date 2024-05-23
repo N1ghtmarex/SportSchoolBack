@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Application.Events.SectionEvents.Handlers
 {
     internal class SectionEventQueriesHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor,
-        ISectionEventMapper sectionEventMapper, IClientService clientService) :
+        ISectionEventMapper sectionEventMapper, IClientService clientService, ISectionService sectionService, ICoachService coachService) :
         IRequestHandler<GetSectionEventsListQuery, PagedResult<SectionEventListViewModel>>, IRequestHandler<GetSectionEventQuery, PagedResult<SectionEventListViewModel>>
     {
         public async Task<PagedResult<SectionEventListViewModel>> Handle(GetSectionEventsListQuery request, CancellationToken cancellationToken)
@@ -81,23 +81,26 @@ namespace Application.Events.SectionEvents.Handlers
 
         public async Task<PagedResult<SectionEventListViewModel>> Handle(GetSectionEventQuery request, CancellationToken cancellationToken)
         {
-            var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
+            var sectionIds = new List<Guid>();
 
-            var section = await dbContext.Sections
-                .AsNoTracking()
-                .Where(x => x.Id == request.SectionId)
-                .Include(x => x.Client)
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (section == null)
+            if (contextAccessor.UserRoles.Contains("Coach"))
             {
-                throw new ObjectNotFoundException(
-                    $"Секция с идентификатором \"{request.SectionId}\" не найдена!");
-            }
+                var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
 
-            var sectionIds = client.Section
+                sectionIds = client.Section
                 .Select(x => x.Id)
                 .ToList();
+            }
+            else
+            {
+                var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+
+                sectionIds = coach.Section
+                .Select(x => x.Id)
+                .ToList();
+            }
+
+            var section = await sectionService.GetSectionAsync(request.SectionId, false, false, false, false, cancellationToken);
 
             if (!sectionIds.Contains(section.Id)) 
             {
