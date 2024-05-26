@@ -22,6 +22,7 @@
     <PackageReference Include="Mapster" Version="7.4.1-pre01" />
     <PackageReference Include="Mapster.Core" Version="1.2.2-pre01" />
     <PackageReference Include="MediatR" Version="12.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 	<Target Name="Mapster">
