@@ -40,7 +40,7 @@ namespace Application.Events.IndividualEvents.Handlers
                 }
                 else
                 {
-                    var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+                    var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
 
                     individualEventQuery = individualEventQuery.Where(x => x.CoachId == coach.Id);
                 }
@@ -164,7 +164,7 @@ namespace Application.Events.IndividualEvents.Handlers
                 }
             }
 
-            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
 
             if (individualEvent.CoachId == coach.Id)
             {

@@ -4,6 +4,6 @@ namespace Abstractions.Services
 {
     public interface ICoachService
     {
-        Task<Coach> GetCoachAync(string id, CancellationToken cancellationToken);
+        Task<Coach> GetCoachAync(string id, bool includeSection, CancellationToken cancellationToken);
     }
 }

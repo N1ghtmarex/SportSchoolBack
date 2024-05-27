@@ -24,7 +24,7 @@ namespace Application.Sections.Handlers
                     "Только тренер может добавлять секции!");
             }
 
-            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
 
             var sectionWithSameName = await dbContext.Sections
                 .Where(x => x.Name == request.Body.Name)
@@ -110,7 +110,7 @@ namespace Application.Sections.Handlers
                     "Только тренер может добавлять секции!");
             }
 
-            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
 
             var section = await sectionService.GetSectionAsync(request.SectionId, true, true, true, true, cancellationToken);
 

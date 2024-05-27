@@ -75,7 +75,7 @@ namespace Application.Sections.Handlers
 
             if (contextAccessor.UserRoles.Contains("Coach"))
             {
-                var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+                var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
 
                 sectionQuery = sectionQuery.Where(x => x.CoachId == coach.Id);
             }
@@ -105,12 +105,23 @@ namespace Application.Sections.Handlers
 
         public async Task<bool> Handle(IsClientInSectionQuery request, CancellationToken cancellationToken)
         {
-            var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
-
-            var section = await dbContext.Sections
+            var sectionQuery = dbContext.Sections
                 .AsNoTracking()
-                .Where(x => x.Id == request.SectionId)
-                .Where(x => x.Client.Contains(client))
+                .Where(x => x.Id == request.SectionId);
+
+            if (contextAccessor.UserRoles.Contains("Coach"))
+            {
+                var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
+                sectionQuery = sectionQuery.Where(x => x.CoachId == coach.Id);
+            }
+            else
+            {
+                var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
+                sectionQuery = sectionQuery.Where(x => x.Client.Contains(client));
+            }
+            
+
+            var section = await sectionQuery
                 .SingleOrDefaultAsync(cancellationToken);
 
             if (section == null)

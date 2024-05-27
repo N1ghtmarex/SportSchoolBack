@@ -83,7 +83,7 @@ namespace Application.Events.SectionEvents.Handlers
         {
             var sectionIds = new List<Guid>();
 
-            if (contextAccessor.UserRoles.Contains("Coach"))
+            if (!contextAccessor.UserRoles.Contains("Coach"))
             {
                 var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
 
@@ -93,7 +93,7 @@ namespace Application.Events.SectionEvents.Handlers
             }
             else
             {
-                var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+                var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, true, cancellationToken);
 
                 sectionIds = coach.Section
                 .Select(x => x.Id)

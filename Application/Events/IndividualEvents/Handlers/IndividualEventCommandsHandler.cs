@@ -23,7 +23,7 @@ namespace Application.Events.IndividualEvents.Handlers
                     "Только тренер может добавлять индивидуальные занятия!");
             }
 
-            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
 
             var sport = await sportService.GetSportAsync(request.Body.SportId, cancellationToken);
 
@@ -125,7 +125,7 @@ namespace Application.Events.IndividualEvents.Handlers
                     $"Индивидуальное занятие с идентификатором {request.EventId} не найдено!");
             }
 
-            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
 
             if (coach.Id == individualEvent.CoachId)
             {

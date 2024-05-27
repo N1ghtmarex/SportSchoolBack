@@ -10,7 +10,7 @@ namespace Infrastructure.Domain.Services
 {
     public class CoachService(ApplicationDbContext dbContext) : ICoachService
     {
-        public async Task<Coach> GetCoachAync(string id, CancellationToken cancellationToken)
+        public async Task<Coach> GetCoachAync(string id, bool includeSection, CancellationToken cancellationToken)
         {
             Defend.Against.Null(id, nameof(id));
 
@@ -19,6 +19,11 @@ namespace Infrastructure.Domain.Services
             var coachQuery = dbContext.Coachs
                 .AsNoTracking()
                 .Where(x => x.ExternalId == coachId);
+
+            if (includeSection)
+            {
+                coachQuery = coachQuery.Include(x => x.Section);
+            }
 
             var coach = await coachQuery.SingleOrDefaultAsync(cancellationToken);
 
