@@ -22,12 +22,14 @@ namespace Application.Sections
         {
             config.NewConfig<(CreateSectionModel Model, Guid CoachId), Section>()
                 .Map(d => d.Name, src => src.Model.Name)
+                .Map(d => d.Description, src => src.Model.Description)
                 .Map(d => d.SportId, src => src.Model.SportId)
                 .Map(d => d.CoachId, src => src.CoachId)
                 .Map(d => d.RoomId, src => src.Model.RoomId);
 
             config.NewConfig<Section, SectionListViewModel>()
                 .Map(d => d.Name, src => src.Name)
+                .Map(d => d.Description, src => src.Description)
                 .Map(d => d.Id, src => src.Id)
                 .Map(d => d.Room, src => src.Room)
                 .Map(d => d.Sport, src => src.Sport);

@@ -4,6 +4,8 @@
     {
         public string Name { get; set; } = string.Empty;
 
+        public string Description { get; set; } = string.Empty;
+
         public Guid SportId { get; set; }
         public Sport Sport { get; set; } = null!;
 

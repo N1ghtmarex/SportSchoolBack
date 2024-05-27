@@ -8,6 +8,7 @@ namespace Application.Sections.Dtos
     {
         public required Guid Id { get; set; }
         public required string Name { get; set; }
+        public required string Description { get; set; }
         public RoomListViewModel Room { get; set; }
         public SportListViewModel Sport { get; set; }
         public CoachListViewModel Coach { get; set; }

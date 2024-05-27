@@ -23,6 +23,7 @@ namespace Application.Events.SectionEvents
                 {
                     Id = p1.Section.Id,
                     Name = p1.Section.Name,
+                    Description = p1.Section.Description,
                     Room = p1.Section.Room == null ? null : new RoomListViewModel()
                     {
                         Id = p1.Section.Room.Id,

@@ -15,6 +15,7 @@ namespace Application.Sections
             return new Section()
             {
                 Name = p1.Item1.Name,
+                Description = p1.Item1.Description,
                 SportId = p1.Item1.SportId,
                 CoachId = p1.Item2,
                 RoomId = p1.Item1.RoomId
@@ -26,6 +27,7 @@ namespace Application.Sections
             {
                 Id = p2.Id,
                 Name = p2.Name,
+                Description = p2.Description,
                 Room = p2.Room == null ? null : new RoomListViewModel()
                 {
                     Id = p2.Room.Id,

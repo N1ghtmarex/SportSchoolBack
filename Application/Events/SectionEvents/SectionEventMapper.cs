@@ -27,6 +27,7 @@ namespace Application.Events.SectionEvents
 
             config.NewConfig<Section, SectionListViewModel>()
                 .Map(d => d.Name, src => src.Name)
+                .Map(d => d.Description, src => src.Description)
                 .Map(d => d.Coach, src => src.Coach)
                 .Map(d => d.Room, src => src.Room)
                 .Map(d => d.Sport, src => src.Sport);
