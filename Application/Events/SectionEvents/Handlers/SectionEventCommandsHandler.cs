@@ -47,7 +47,7 @@ namespace Application.Events.SectionEvents.Handlers
 
             var startTime = TimeOnly.Parse(request.Body.StartTime);
             var endTime = TimeOnly.Parse(request.Body.EndTime);
-            var period = DateOnly.ParseExact(request.Body.Period, "yyyy-MM-dd");
+            var period = DateOnly.ParseExact(request.Body.Period, "dd-MM-yyyy");
 
             var sectionEventWithSameData = await dbContext.SectionEvents
                 .Where(x => x.DayOfWeek == request.Body.DayOfWeek)

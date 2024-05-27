@@ -29,9 +29,10 @@ namespace Application.Events.IndividualEvents.Handlers
 
             var room = await roomService.GetRoomAsync(request.Body.RoomId, cancellationToken);
 
-            var startDate = DateTime.ParseExact(request.Body.StartDate, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture).ToUniversalTime();
-            var duration = TimeOnly.Parse(request.Body.Duration);
-            var endDate = startDate.AddHours(duration.Hour).AddMinutes(duration.Minute);
+            var startDate = DateTime.ParseExact(request.Body.StartDate, "dd-MM-yyyy HH:mm", CultureInfo.InvariantCulture).ToUniversalTime();
+            var endTime = TimeOnly.Parse(request.Body.EndTime);
+            var duration = endTime - TimeOnly.FromDateTime(startDate.ToLocalTime());
+            var endDate = startDate.AddHours(duration.Hours).AddMinutes(duration.Minutes);
 
             var individualEventWithSameData = await dbContext.IndividualEvents
                 .AsNoTracking()
