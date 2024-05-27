@@ -6,6 +6,7 @@ using Core.EntityFramework.Features.SearchPagination;
 using Core.EntityFramework.Features.SearchPagination.Models;
 using Core.Exceptions;
 using Domain;
+using Domain.Entities;
 using MediatR;
 
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Sections.Handlers
 {
-    internal class SectionQueriesHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ISectionMapper sectionMapper, IClientService clientService) :
+    internal class SectionQueriesHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ISectionMapper sectionMapper, IClientService clientService,
+        ICoachService coachService) :
         IRequestHandler<GetSectionsListQuery, PagedResult<SectionListViewModel>>, IRequestHandler<GetSectionQuery, SectionListViewModel>, 
         IRequestHandler<GetUserSectionsQuery, PagedResult<SectionListViewModel>>, IRequestHandler<IsClientInSectionQuery, bool>
     {
@@ -63,14 +65,33 @@ namespace Application.Sections.Handlers
 
         public async Task<PagedResult<SectionListViewModel>> Handle(GetUserSectionsQuery request, CancellationToken cancellationToken)
         {
-            var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
 
-            var sectionQuery = dbContext.Sections
+
+            IQueryable<Section> sectionQuery = dbContext.Sections
                 .AsNoTracking()
                 .Include(x => x.Sport)
                 .Include(x => x.Room)
-                .Include(x => x.Coach)
-                .Where(x => x.Client.Contains(client))
+                .Include(x => x.Coach);
+
+            if (contextAccessor.UserRoles.Contains("Coach"))
+            {
+                var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, cancellationToken);
+
+                sectionQuery = sectionQuery.Where(x => x.CoachId == coach.Id);
+            }
+            else
+            {
+                var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
+
+                sectionQuery = sectionQuery.Where(x => x.Client.Contains(client));
+            }
+
+            if (request.SportId != null)
+            {
+                sectionQuery = sectionQuery.Where(x => x.SportId == request.SportId);
+            }
+
+            sectionQuery = sectionQuery
                 .OrderBy(x => x.Name)
                 .ApplySearch(request, x => x.Name);
 
