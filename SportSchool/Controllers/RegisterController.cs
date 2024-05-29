@@ -12,7 +12,7 @@ namespace SportSchool.Controllers
     {
 
         [HttpPost]
-        public async Task<CreatedOrUpdatedEntityViewModel<Guid>> RegisterUser([FromQuery] RegisterUserCommand command, CancellationToken cancellationToken)
+        public async Task<CreatedOrUpdatedEntityViewModel<Guid>> RegisterUser([FromForm] RegisterUserCommand command, CancellationToken cancellationToken)
         {
             return await sender.Send(command, cancellationToken);
         }

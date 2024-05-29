@@ -1,7 +1,10 @@
-﻿namespace Application.Register.Dtos
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Application.Register.Dtos
 {
     public class RegisterUserModel
     {
+        public required IFormFile Image { get; set; }
         public required string Email { get; set; }
         public required string Password { get; set; }
         public required string Phone { get; set; }

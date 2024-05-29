@@ -7,7 +7,7 @@ namespace Application.Register.Commands
 {
     public class RegisterUserCommand : IRequest<CreatedOrUpdatedEntityViewModel<Guid>>
     {
-        [FromBody]
+        [FromForm]
         public required RegisterUserModel Body { get; set; }
     }
 }

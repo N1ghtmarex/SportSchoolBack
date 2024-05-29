@@ -97,6 +97,13 @@ namespace Application.Register.Handlers
             var createdClient = await dbContext.AddAsync(clientToCreate, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
 
+            var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "SportSchool", "wwwroot", "users");
+            var filePath = Path.Combine(imagesDirectory, $"{createdClient.Entity.Id.ToString()}.jpeg");
+            using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                request.Body.Image.CopyTo(fileStream);
+            }
+
             return new CreatedOrUpdatedEntityViewModel(createdClient.Entity.Id);
         }
     }
