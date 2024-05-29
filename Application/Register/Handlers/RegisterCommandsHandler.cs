@@ -98,7 +98,7 @@ namespace Application.Register.Handlers
             await dbContext.SaveChangesAsync(cancellationToken);
 
             var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "SportSchool", "wwwroot", "users");
-            var filePath = Path.Combine(imagesDirectory, $"{createdClient.Entity.Id.ToString()}.jpeg");
+            var filePath = Path.Combine(imagesDirectory, $"{createdClient.Entity.ExternalId.ToString()}.jpeg");
             using (Stream fileStream = new FileStream(filePath, FileMode.Create))
             {
                 request.Body.Image.CopyTo(fileStream);
