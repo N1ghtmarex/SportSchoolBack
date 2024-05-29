@@ -93,7 +93,7 @@ namespace Application.Register.Handlers
 
             string userId = firstObject["id"]!.ToString();
 
-            var clientToCreate = clientMapper.MapToEntity((request.Body.Name, request.Body.Surname, Guid.Parse(userId)));
+            var clientToCreate = clientMapper.MapToEntity((request.Body.Name, request.Body.Surname, request.Body.Phone, Guid.Parse(userId)));
             var createdClient = await dbContext.AddAsync(clientToCreate, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
 
