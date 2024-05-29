@@ -81,32 +81,7 @@ namespace Application.Events.SectionEvents.Handlers
 
         public async Task<PagedResult<SectionEventListViewModel>> Handle(GetSectionEventQuery request, CancellationToken cancellationToken)
         {
-            var sectionIds = new List<Guid>();
-
-            if (!contextAccessor.UserRoles.Contains("Coach"))
-            {
-                var client = await clientService.GetClientAsync(contextAccessor.IdentityUserId, true, cancellationToken);
-
-                sectionIds = client.Section
-                .Select(x => x.Id)
-                .ToList();
-            }
-            else
-            {
-                var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, true, cancellationToken);
-
-                sectionIds = coach.Section
-                .Select(x => x.Id)
-                .ToList();
-            }
-
             var section = await sectionService.GetSectionAsync(request.SectionId, false, false, false, false, cancellationToken);
-
-            if (!sectionIds.Contains(section.Id)) 
-            {
-                throw new BusinessLogicException(
-                    $"Пользователь с внешним идентификатором \"{contextAccessor.IdentityUserId}\" не состоит в секции с идентификатором \"{section.Id}\"!");
-            }
 
             var sectionEventQuery = dbContext.SectionEvents
                 .AsNoTracking()
