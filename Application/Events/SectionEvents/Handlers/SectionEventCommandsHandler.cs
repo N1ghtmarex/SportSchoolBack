@@ -1,4 +1,5 @@
 ﻿using Abstractions.CommonModels;
+using Abstractions.Services;
 using Application.Events.SectionEvents.Commands;
 using Core.Exceptions;
 using Domain;
@@ -8,8 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Events.SectionEvents.Handlers
 {
-    internal class SectionEventCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor) :
-        IRequestHandler<CreateSectionEventCommand, CreatedOrUpdatedEntityViewModel<Guid>>
+    internal class SectionEventCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ICoachService coachService) :
+        IRequestHandler<CreateSectionEventCommand, CreatedOrUpdatedEntityViewModel<Guid>>, IRequestHandler<DeleteSectionEventCommand, string>
     {
         public async Task<CreatedOrUpdatedEntityViewModel<Guid>> Handle(CreateSectionEventCommand request, CancellationToken cancellationToken)
         {
@@ -78,6 +79,33 @@ namespace Application.Events.SectionEvents.Handlers
             await dbContext.SaveChangesAsync(cancellationToken);
 
             return new CreatedOrUpdatedEntityViewModel(createdSectionEvent.Entity.Id);
+        }
+
+        public async Task<string> Handle(DeleteSectionEventCommand request, CancellationToken cancellationToken)
+        {
+            var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
+
+            var sectionEvent = await dbContext.SectionEvents
+                .Where(x => x.Id == request.EventId)
+                .Include(x => x.Section)
+                .SingleOrDefaultAsync(cancellationToken);
+
+            if (sectionEvent == null) 
+            {
+                throw new ObjectNotFoundException(
+                    $"Занятие с идентификатором \"{request.EventId}\" не найдено!");
+            }
+
+            if (sectionEvent.Section.CoachId != coach.Id)
+            {
+                throw new BusinessLogicException(
+                    $"Вы не можете удалить это занятие, поскольку не являетесь тренером, проводящим это занятие!");
+            }
+
+            dbContext.Remove(sectionEvent);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return "Занятие удалено!";
         }
     }
 }

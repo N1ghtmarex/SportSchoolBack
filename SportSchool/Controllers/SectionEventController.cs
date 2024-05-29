@@ -53,5 +53,12 @@ namespace SportSchool.Controllers
         {
             return await sender.Send(query, cancellationToken);
         }
+
+        [HttpDelete("{EventId}")]
+        public async Task<ActionResult<string>> DeleteEvent(
+            [FromQuery] DeleteSectionEventCommand command, CancellationToken cancellationToken)
+        {
+            return await sender.Send(command, cancellationToken);
+        }
     }
 }
