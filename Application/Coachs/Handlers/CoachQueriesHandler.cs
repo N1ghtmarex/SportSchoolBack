@@ -1,4 +1,5 @@
 ﻿using Abstractions.CommonModels;
+using Abstractions.Services;
 using Application.Coachs.Dtos;
 using Application.Coachs.Queries;
 using Core.EntityFramework.Features.SearchPagination;
@@ -9,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Coachs.Handlers
 {
-    internal class CoachQueriesHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ICoachMapper coachMapper) :
+    internal class CoachQueriesHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ICoachService coachService, ICoachMapper coachMapper) :
         IRequestHandler<GetCoachsListQuery, PagedResult<CoachListViewModel>>, IRequestHandler<GetCoachQuery, CoachViewModel>
     {
         public async Task<PagedResult<CoachListViewModel>> Handle(GetCoachsListQuery request, CancellationToken cancellationToken)
@@ -28,9 +29,11 @@ namespace Application.Coachs.Handlers
             return result.AsPagedResult(request, await coachQuery.CountAsync(cancellationToken));
         }
 
-        public Task<CoachViewModel> Handle(GetCoachQuery request, CancellationToken cancellationToken)
+        public async Task<CoachViewModel> Handle(GetCoachQuery request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var coach = await coachService.GetCoachAync(request.CoachId.ToString(), false, cancellationToken);
+
+            return coachMapper.MapToViewModel(coach);
         }
     }
 }

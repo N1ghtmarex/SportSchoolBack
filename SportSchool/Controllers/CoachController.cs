@@ -27,5 +27,12 @@ public class CoachController(ISender sender) : BaseController
     {
         return await sender.Send(query, cancellationToken);
     }
+
+    [HttpGet("{CoachId}")]
+    public async Task<CoachViewModel> GetCoach(
+        [FromQuery] GetCoachQuery query, CancellationToken cancellationToken)
+    {
+        return await sender.Send(query, cancellationToken);
+    }
 }
 
