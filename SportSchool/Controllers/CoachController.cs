@@ -21,6 +21,7 @@ public class CoachController(ISender sender) : BaseController
         return await sender.Send(command, cancellationToken);
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<PagedResult<CoachListViewModel>> GetCoachsList(
         [FromQuery] GetCoachsListQuery query, CancellationToken cancellationToken)
@@ -33,6 +34,13 @@ public class CoachController(ISender sender) : BaseController
         [FromQuery] GetCoachQuery query, CancellationToken cancellationToken)
     {
         return await sender.Send(query, cancellationToken);
+    }
+
+    [HttpPut]
+    public async Task<ActionResult<string>> UpdateCoach(
+        [FromForm] UpdateCoachCommand command, CancellationToken cancellationToken)
+    {
+        return await sender.Send(command, cancellationToken);
     }
 }
 

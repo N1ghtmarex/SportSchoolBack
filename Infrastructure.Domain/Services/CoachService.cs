@@ -17,7 +17,6 @@ namespace Infrastructure.Domain.Services
             var coachId = Guid.Parse(id);
 
             var coachQuery = dbContext.Coachs
-                .AsNoTracking()
                 .Where(x => x.ExternalId == coachId);
 
             if (includeSection)
