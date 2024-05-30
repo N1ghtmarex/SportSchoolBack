@@ -39,7 +39,16 @@ namespace Application.Events.SectionEvents
                         Id = p1.Section.Coach.Id,
                         ExternalId = p1.Section.Coach.ExternalId,
                         Name = p1.Section.Coach.Name,
-                        Surname = p1.Section.Coach.Surname
+                        Surname = p1.Section.Coach.Surname,
+                        Phone = p1.Section.Coach.Phone,
+                        Institution = p1.Section.Coach.Institution,
+                        Faculty = p1.Section.Coach.Faculty,
+                        Speciality = p1.Section.Coach.Speciality,
+                        EducationForm = p1.Section.Coach.EducationForm,
+                        Qualification = p1.Section.Coach.Qualification,
+                        Job = p1.Section.Coach.Job,
+                        JobTitle = p1.Section.Coach.JobTitle,
+                        JobPeriod = p1.Section.Coach.JobPeriod
                     }
                 }
             };

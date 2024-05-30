@@ -14,6 +14,7 @@ namespace Application.Coachs
                 ExternalId = p1.Item1.ExternalId,
                 Name = p1.Item2,
                 Surname = p1.Item3,
+                Phone = p1.Item4,
                 Institution = p1.Item1.Institution,
                 Faculty = p1.Item1.Faculty,
                 Speciality = p1.Item1.Speciality,
@@ -31,7 +32,16 @@ namespace Application.Coachs
                 Id = p2.Id,
                 ExternalId = p2.ExternalId,
                 Name = p2.Name,
-                Surname = p2.Surname
+                Surname = p2.Surname,
+                Phone = p2.Phone,
+                Institution = p2.Institution,
+                Faculty = p2.Faculty,
+                Speciality = p2.Speciality,
+                EducationForm = p2.EducationForm,
+                Qualification = p2.Qualification,
+                Job = p2.Job,
+                JobTitle = p2.JobTitle,
+                JobPeriod = p2.JobPeriod
             };
         }
         public CoachViewModel MapToViewModel(Coach p3)
@@ -41,7 +51,16 @@ namespace Application.Coachs
                 Id = p3.Id,
                 ExternalId = p3.ExternalId,
                 Name = p3.Name,
-                Surname = p3.Surname
+                Surname = p3.Surname,
+                Phone = p3.Phone,
+                Institution = p3.Institution,
+                Faculty = p3.Faculty,
+                Speciality = p3.Speciality,
+                EducationForm = p3.EducationForm,
+                Qualification = p3.Qualification,
+                Job = p3.Job,
+                JobTitle = p3.JobTitle,
+                JobPeriod = p3.JobPeriod
             };
         }
     }

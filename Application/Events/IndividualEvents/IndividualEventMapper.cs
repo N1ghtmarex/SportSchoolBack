@@ -27,8 +27,19 @@ namespace Application.Events.IndividualEvents
                 .Map(d => d.ClientId, src => src.ClientId);
 
             config.NewConfig<Coach, CoachListViewModel>()
+                .Map(d => d.Id, src => src.Id)
+                .Map(d => d.ExternalId, src => src.ExternalId)
                 .Map(d => d.Name, src => src.Name)
-                .Map(d => d.Surname, src => src.Surname);
+                .Map(d => d.Surname, src => src.Surname)
+                .Map(d => d.Phone, src => src.Phone)
+                .Map(d => d.Institution, src => src.Institution)
+                .Map(d => d.Faculty, src => src.Faculty)
+                .Map(d => d.Speciality, src => src.Speciality)
+                .Map(d => d.EducationForm, src => src.EducationForm)
+                .Map(d => d.Qualification, src => src.Qualification)
+                .Map(d => d.Job, src => src.Job)
+                .Map(d => d.JobTitle, src => src.JobTitle)
+                .Map(d => d.JobPeriod, src => src.JobPeriod);
 
             config.NewConfig<Sport, SportListViewModel>()
                 .Map(d => d.Name, src => src.Name);

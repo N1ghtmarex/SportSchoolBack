@@ -21,7 +21,16 @@ namespace Application.Events.IndividualEvents
                     Id = p1.Coach.Id,
                     ExternalId = p1.Coach.ExternalId,
                     Name = p1.Coach.Name,
-                    Surname = p1.Coach.Surname
+                    Surname = p1.Coach.Surname,
+                    Phone = p1.Coach.Phone,
+                    Institution = p1.Coach.Institution,
+                    Faculty = p1.Coach.Faculty,
+                    Speciality = p1.Coach.Speciality,
+                    EducationForm = p1.Coach.EducationForm,
+                    Qualification = p1.Coach.Qualification,
+                    Job = p1.Coach.Job,
+                    JobTitle = p1.Coach.JobTitle,
+                    JobPeriod = p1.Coach.JobPeriod
                 },
                 Sport = p1.Sport == null ? null : new SportListViewModel()
                 {

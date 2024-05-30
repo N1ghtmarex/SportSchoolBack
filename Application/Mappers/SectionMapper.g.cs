@@ -43,7 +43,16 @@ namespace Application.Sections
                     Id = p2.Coach.Id,
                     ExternalId = p2.Coach.ExternalId,
                     Name = p2.Coach.Name,
-                    Surname = p2.Coach.Surname
+                    Surname = p2.Coach.Surname,
+                    Phone = p2.Coach.Phone,
+                    Institution = p2.Coach.Institution,
+                    Faculty = p2.Coach.Faculty,
+                    Speciality = p2.Coach.Speciality,
+                    EducationForm = p2.Coach.EducationForm,
+                    Qualification = p2.Coach.Qualification,
+                    Job = p2.Coach.Job,
+                    JobTitle = p2.Coach.JobTitle,
+                    JobPeriod = p2.Coach.JobPeriod
                 }
             };
         }
