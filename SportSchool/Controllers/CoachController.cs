@@ -16,7 +16,7 @@ namespace SportSchool.Controllers;
 public class CoachController(ISender sender) : BaseController
 {
     [HttpPost]
-    public async Task<CreatedOrUpdatedEntityViewModel<Guid>> CreateCoach(CreateCoachCommand command, CancellationToken cancellationToken)
+    public async Task<CreatedOrUpdatedEntityViewModel<Guid>> CreateCoach([FromQuery] CreateCoachCommand command, CancellationToken cancellationToken)
     {
         return await sender.Send(command, cancellationToken);
     }

@@ -14,8 +14,10 @@ namespace Application.Coachs.Handlers
     {
         public async Task<CreatedOrUpdatedEntityViewModel<Guid>> Handle(CreateCoachCommand request, CancellationToken cancellationToken)
         {
+            var clientWithSameId = await clientService.GetClientAsync(request.Body.ExternalId.ToString(), false, cancellationToken);
+
             var coachWithSameId = await dbContext.Coachs
-                .Where(x => x.ExternalId == Guid.Parse(contextAccessor.IdentityUserId))
+                .Where(x => x.ExternalId == request.Body.ExternalId)
                 .SingleOrDefaultAsync(cancellationToken);
 
             if (coachWithSameId != null)
@@ -24,19 +26,12 @@ namespace Application.Coachs.Handlers
                     $"Тренер с идентификатором \"{coachWithSameId.ExternalId}\" уже существует!");
             }
 
-            var coachToCreate = coachMapper.MapToEntity((contextAccessor.UserName, contextAccessor.UserSurname, Guid.Parse(contextAccessor.IdentityUserId)));
+            var coachToCreate = coachMapper.MapToEntity((request.Body, clientWithSameId.Name, clientWithSameId.Surname, clientWithSameId.Phone));
             var createdCoach = await dbContext.AddAsync(coachToCreate, cancellationToken);
+
+            dbContext.Remove(clientWithSameId);
+
             await dbContext.SaveChangesAsync();
-
-            var clientWithSameId = await dbContext.Clients
-                .Where(x => x.ExternalId == Guid.Parse(contextAccessor.IdentityUserId))
-                .SingleOrDefaultAsync(cancellationToken);
-
-            if (clientWithSameId != null)
-            {
-                dbContext.Remove(clientWithSameId);
-                await dbContext.SaveChangesAsync();
-            }
 
             return new CreatedOrUpdatedEntityViewModel(createdCoach.Entity.Id);
         }
