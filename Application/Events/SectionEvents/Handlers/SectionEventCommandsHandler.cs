@@ -64,7 +64,16 @@ namespace Application.Events.SectionEvents.Handlers
                     $"Занятие с указанными данными уже существует!");
             }
 
+            var sectionEventsInThisTime = await dbContext.SectionEvents
+                .Where(x => x.Period >= DateOnly.FromDateTime(DateTime.Today) && x.Period >= period)
+                .Where(x => x.StartTime >= endTime || x.EndTime >= startTime)
+                .FirstOrDefaultAsync(cancellationToken);
 
+            if (sectionEventsInThisTime != null)
+            {
+                throw new BusinessLogicException(
+                    $"На это время уже существует занятие!");
+            }
 
             var sectionEventToCreate = new SectionEvent
             {
