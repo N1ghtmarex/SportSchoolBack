@@ -6,7 +6,6 @@ using Core.EntityFramework.Features.SearchPagination;
 using Core.EntityFramework.Features.SearchPagination.Models;
 using Core.Exceptions;
 using Domain;
-using Domain.Entities;
 using MediatR;
 
 using Microsoft.EntityFrameworkCore;
@@ -25,20 +24,18 @@ namespace Application.Sections.Handlers
         public async Task<PagedResult<SectionListViewModel>> Handle(GetSectionsListQuery request, CancellationToken cancellationToken)
         {
             var sectionQuery = dbContext.Sections
-                .AsNoTracking();
+                .AsNoTracking()
+                .Include(x => x.Sport)
+                .Include(x => x.Room)
+                .Include(x => x.Coach)
+                .OrderBy(x => x.Name)
+                .ApplySearch(request, x => x.Name);
 
             if (request.SportId != null)
             {
                 sectionQuery = sectionQuery
                     .Where(x => x.SportId == request.SportId);
             }
-
-            sectionQuery = sectionQuery
-                .Include(x => x.Sport)
-                .Include(x => x.Room)
-                .Include(x => x.Coach)
-                .OrderBy(x => x.Name)
-                .ApplySearch(request, x => x.Name);
 
             var sectionsList = await sectionQuery
                 .ApplyPagination(request)
@@ -67,11 +64,12 @@ namespace Application.Sections.Handlers
         {
 
 
-            IQueryable<Section> sectionQuery = dbContext.Sections
+            var sectionQuery = dbContext.Sections
                 .AsNoTracking()
                 .Include(x => x.Sport)
                 .Include(x => x.Room)
-                .Include(x => x.Coach);
+                .Include(x => x.Coach)
+                .AsQueryable();
 
             if (contextAccessor.UserRoles.Contains("Coach"))
             {
