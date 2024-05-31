@@ -19,7 +19,9 @@ namespace Application.Events.SectionEvents.Handlers
         public async Task<PagedResult<SectionEventListViewModel>> Handle(GetSectionEventsListQuery request, CancellationToken cancellationToken)
         {
             var sectionEventQuery = dbContext.SectionEvents
-                .AsNoTracking();
+                .AsNoTracking()
+                .Where(x => x.Period >= DateOnly.FromDateTime(DateTime.Today) 
+                || (x.Period >= DateOnly.FromDateTime(DateTime.Today).AddDays(-7) && x.DayOfWeek <= (int)DateOnly.FromDateTime(DateTime.Today).DayOfWeek));
 
             if (contextAccessor.UserRoles.Contains("Coach"))
             {
