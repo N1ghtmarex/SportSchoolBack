@@ -4,6 +4,7 @@ using Application.Coachs.Commands;
 using Application.Register.Handlers;
 using Core.Exceptions;
 using Domain;
+using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
@@ -78,6 +79,39 @@ namespace Application.Coachs.Handlers
         public async Task<string> Handle(UpdateCoachCommand request, CancellationToken cancellationToken)
         {
             var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
+
+            var httpClient = new HttpClient();
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/realms/master/protocol/openid-connect/token");
+
+            var collection = new List<KeyValuePair<string, string>>
+            {
+                new("username", "admin"),
+                new("grant_type", "password"),
+                new("client_id", "admin-cli"),
+                new("password", "admin")
+            };
+
+            var content = new FormUrlEncodedContent(collection);
+            httpRequest.Content = content;
+
+            var response = await httpClient.SendAsync(httpRequest);
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var token = System.Text.Json.JsonSerializer.Deserialize<Token>(responseString);
+
+
+            httpRequest = new HttpRequestMessage(HttpMethod.Put, $"http://localhost:8080/admin/realms/SportSchool/users/{coach.ExternalId}");
+            httpRequest.Headers.Add("Authorization", $"Bearer {token!.access_token}");
+
+            var jsonString = new StringContent($@"
+            {{
+                ""firstName"": ""{request.Body.Name}"",
+                ""lastName"": ""{request.Body.Surname}""
+            }}", null, "application/json");
+
+            httpRequest.Content = jsonString;
+            response = await httpClient.SendAsync(httpRequest);
+            response.EnsureSuccessStatusCode();
 
             coach.Name = request.Body.Name;
             coach.Surname = request.Body.Surname;
