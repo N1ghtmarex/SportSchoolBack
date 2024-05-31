@@ -1,10 +1,12 @@
 ﻿using Abstractions.CommonModels;
 using Abstractions.Services;
 using Application.Coachs.Commands;
+using Application.Register.Handlers;
 using Core.Exceptions;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace Application.Coachs.Handlers
 {
@@ -25,6 +27,43 @@ namespace Application.Coachs.Handlers
                 throw new BusinessLogicException(
                     $"Тренер с идентификатором \"{coachWithSameId.ExternalId}\" уже существует!");
             }
+
+            var httpClient = new HttpClient();
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/realms/master/protocol/openid-connect/token");
+
+            var collection = new List<KeyValuePair<string, string>>
+            {
+                new("username", "admin"),
+                new("grant_type", "password"),
+                new("client_id", "admin-cli"),
+                new("password", "admin")
+            };
+
+            var content = new FormUrlEncodedContent(collection);
+            httpRequest.Content = content;
+
+            var response = await httpClient.SendAsync(httpRequest);
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var token = System.Text.Json.JsonSerializer.Deserialize<Token>(responseString);
+
+
+            var addRoleRequest = new HttpRequestMessage(HttpMethod.Post, 
+                $"http://localhost:8080/admin/realms/SportSchool/users/{clientWithSameId.ExternalId}/role-mappings/realm");
+            addRoleRequest.Headers.Add("Authorization", $"Bearer {token!.access_token}");
+            var addRoleContent = new StringContent($@"
+            [
+                {{
+                ""id"": ""72ae3bc3-eebb-4148-8584-66888e3681ad"",
+                ""name"": ""Coach""
+                }}
+            ]", null, "application/json");
+            addRoleRequest.Content = addRoleContent;
+
+            response = await httpClient.SendAsync(addRoleRequest);
+            response.EnsureSuccessStatusCode();
+            responseString = await response.Content.ReadAsStringAsync();
+
 
             var coachToCreate = coachMapper.MapToEntity((request.Body, clientWithSameId.Name, clientWithSameId.Surname, clientWithSameId.Phone));
             var createdCoach = await dbContext.AddAsync(coachToCreate, cancellationToken);
