@@ -18,22 +18,22 @@ jobs:
         dotnet-version: '8.0.x'
         
     - name: Restore dependencies
-      run: dotnet restore ./SportSchool/SportSchool.csproj
+      run: sudo dotnet restore ./SportSchool/SportSchool.csproj
       
     - name: Build
-      run: dotnet build ./SportSchool/SportSchool.csproj --no-restore -c Release
+      run: sudo dotnet build ./SportSchool/SportSchool.csproj --no-restore -c Release
       
     - name: Publish
-      run: dotnet publish ./SportSchool/SportSchool.csproj -c Release -o ./publish
+      run: sudo dotnet publish ./SportSchool/SportSchool.csproj -c Release -o ./publish
       
     - name: Build Docker image
-      run: docker build -t cr.yandex/crp3c1c28sanklsi8n9r/sportschool:latest -f SportSchool/Dockerfile .
+      run: sudo docker build -t cr.yandex/crp3c1c28sanklsi8n9r/sportschool:latest -f SportSchool/Dockerfile .
       
     - name: Log in to DockerHub
-      run: docker login --username ${{ secrets.YANDEX_CLOUD_USERNAME }} --password ${{ secrets.YANDEX_CLOUD_ACCESS_TOKEN }} cr.yandex
+      run: sudo docker login --username ${{ secrets.YANDEX_CLOUD_USERNAME }} --password ${{ secrets.YANDEX_CLOUD_ACCESS_TOKEN }} cr.yandex
         
     - name: Push Docker image to DockerHub
-      run: docker push cr.yandex/crp3c1c28sanklsi8n9r/sportschool:latest
+      run: sudo docker push cr.yandex/crp3c1c28sanklsi8n9r/sportschool:latest
       
     - name: Deploy to VPS
       uses: appleboy/ssh-action@master
@@ -43,6 +43,6 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
             cd /
-            docker compose -p sportschool pull
-            docker compose -p sportschool down
-            docker compose -p sportschool up -d
+            sudo docker compose -p sportschool pull
+            sudo docker compose -p sportschool down
+            sudo docker compose -p sportschool up -d
