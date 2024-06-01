@@ -17,7 +17,7 @@ COPY ["Infrastructure.Domain/Infrastructure.Domain.csproj", "Infrastructure.Doma
 COPY ["Infrastructure.External/Infrastructure.External.csproj", "Infrastructure.External/"]
 COPY ["Keycloak/Keycloak.csproj", "Keycloak/"]
 COPY ["SportSchool/SportSchool.csproj", "SportSchool/"]
-COPY ["Dockerfile", "SportSchool/Dockerfile/"]
+COPY ["Dockerfile", "SportSchool/Dockerfile"]
 RUN dotnet restore "SportSchool/SportSchool.csproj"
 COPY . .
 WORKDIR "/src/SportSchool"
