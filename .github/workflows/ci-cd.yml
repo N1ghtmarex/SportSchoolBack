@@ -1,0 +1,48 @@
+name: .NET Core CI/CD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore ./SportSchool/SportSchool.csproj
+      
+    - name: Build
+      run: dotnet build ./SportSchool/SportSchool.csproj --no-restore -c Release
+      
+    - name: Publish
+      run: dotnet publish ./SportSchool/SportSchool.csproj -c Release -o ./publish
+      
+    - name: Build Docker image
+      run: docker build -t cr.yandex/crp3c1c28sanklsi8n9r/sportschool:latest -f SportSchool/Dockerfile .
+      
+    - name: Log in to DockerHub
+      run: docker login --username ${{ secrets.YANDEX_CLOUD_USERNAME }} --password ${{ secrets.YANDEX_CLOUD_ACCESS_TOKEN }} cr.yandex
+        
+    - name: Push Docker image to DockerHub
+      run: docker push cr.yandex/crp3c1c28sanklsi8n9r/sportschool:latest
+      
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_SERVER }}
+        username: ${{ secrets.DEPLOY_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+            cd /
+            docker compose -p sportschool pull
+            docker compose -p sportschool down
+            docker compose -p sportschool up -d
