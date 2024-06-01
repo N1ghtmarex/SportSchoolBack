@@ -46,3 +46,5 @@ jobs:
             sudo docker compose -p sportschool pull
             sudo docker compose -p sportschool down
             sudo docker compose -p sportschool up -d
+            cd Keycloak/
+            sudo docker compose -p keycloak up -d
