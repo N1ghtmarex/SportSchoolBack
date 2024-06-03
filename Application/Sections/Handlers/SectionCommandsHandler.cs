@@ -44,11 +44,14 @@ namespace Application.Sections.Handlers
             var createdSection = await dbContext.AddAsync(sectionToCreate, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "SportSchool", "wwwroot", "sections");
-            var filePath = Path.Combine(imagesDirectory, $"{createdSection.Entity.Id.ToString()}.jpeg");
-            using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+            if (request.Body.Image != null)
             {
-                request.Body.Image.CopyTo(fileStream);
+                var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "SportSchool", "wwwroot", "sections");
+                var filePath = Path.Combine(imagesDirectory, $"{createdSection.Entity.Id.ToString()}.jpeg");
+                using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    request.Body.Image.CopyTo(fileStream);
+                }
             }
 
             return new CreatedOrUpdatedEntityViewModel(createdSection.Entity.Id);
