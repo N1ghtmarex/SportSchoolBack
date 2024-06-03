@@ -40,11 +40,9 @@ jobs:
       with:
         host: ${{ secrets.DEPLOY_SERVER }}
         username: ${{ secrets.DEPLOY_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        password: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
             cd /
             sudo docker compose -p sportschool pull
             sudo docker compose -p sportschool down
             sudo docker compose -p sportschool up -d
-            cd Keycloak/
-            sudo docker compose -p keycloak up -d
