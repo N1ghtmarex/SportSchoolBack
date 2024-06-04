@@ -55,7 +55,7 @@ namespace Application.Coachs.Handlers
             var addRoleContent = new StringContent($@"
             [
                 {{
-                ""id"": ""72ae3bc3-eebb-4148-8584-66888e3681ad"",
+                ""id"": ""7efcdba0-8a06-4c76-89d8-39d86b82fde5"",
                 ""name"": ""Coach""
                 }}
             ]", null, "application/json");
