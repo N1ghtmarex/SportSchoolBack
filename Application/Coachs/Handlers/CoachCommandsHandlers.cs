@@ -30,7 +30,7 @@ namespace Application.Coachs.Handlers
             }
 
             var httpClient = new HttpClient();
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/realms/master/protocol/openid-connect/token");
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://identity.chel-sport-school.ru/realms/master/protocol/openid-connect/token");
 
             var collection = new List<KeyValuePair<string, string>>
             {
@@ -81,7 +81,7 @@ namespace Application.Coachs.Handlers
             var coach = await coachService.GetCoachAync(contextAccessor.IdentityUserId, false, cancellationToken);
 
             var httpClient = new HttpClient();
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/realms/master/protocol/openid-connect/token");
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://identity.chel-sport-school.ru/realms/master/protocol/openid-connect/token");
 
             var collection = new List<KeyValuePair<string, string>>
             {
@@ -100,7 +100,7 @@ namespace Application.Coachs.Handlers
             var token = System.Text.Json.JsonSerializer.Deserialize<Token>(responseString);
 
 
-            httpRequest = new HttpRequestMessage(HttpMethod.Put, $"http://localhost:8080/admin/realms/SportSchool/users/{coach.ExternalId}");
+            httpRequest = new HttpRequestMessage(HttpMethod.Put, $"https://identity.chel-sport-school.ru/admin/realms/SportSchool/users/{coach.ExternalId}");
             httpRequest.Headers.Add("Authorization", $"Bearer {token!.access_token}");
 
             var jsonString = new StringContent($@"
