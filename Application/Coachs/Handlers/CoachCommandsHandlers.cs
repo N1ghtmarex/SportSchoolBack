@@ -142,7 +142,7 @@ namespace Application.Coachs.Handlers
                 }
                 
 
-                using (Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (Stream fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     request.Body.Image.CopyTo(fileStream);
                 }
