@@ -3,6 +3,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
+RUN chmod -R 777 /app/wwwroot
 EXPOSE 1337
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
