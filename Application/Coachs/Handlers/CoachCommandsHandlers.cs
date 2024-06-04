@@ -131,7 +131,7 @@ namespace Application.Coachs.Handlers
             {
                 var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "SportSchool", "wwwroot", "users");
                 //var filePath = Path.Combine(imagesDirectory, $"{coach.ExternalId}.jpeg");
-                var filePath = Path.Combine("/var/www/html/assets/images/", $"{coach.ExternalId}.jpeg");
+                var filePath = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, $"{coach.ExternalId}.jpeg");
 
                 if (File.Exists(filePath))
                 {
