@@ -50,7 +50,7 @@ namespace Application.Coachs.Handlers
 
 
             var addRoleRequest = new HttpRequestMessage(HttpMethod.Post, 
-                $"http://localhost:8080/admin/realms/SportSchool/users/{clientWithSameId.ExternalId}/role-mappings/realm");
+                $"https://identity.chel-sport-school.ru/admin/realms/SportSchool/users/{clientWithSameId.ExternalId}/role-mappings/realm");
             addRoleRequest.Headers.Add("Authorization", $"Bearer {token!.access_token}");
             var addRoleContent = new StringContent($@"
             [
