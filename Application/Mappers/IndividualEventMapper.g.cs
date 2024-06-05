@@ -19,6 +19,7 @@ namespace Application.Events.IndividualEvents
                 Coach = p1.Coach == null ? null : new CoachListViewModel()
                 {
                     Id = p1.Coach.Id,
+                    ImageFileName = p1.Coach.ImageFileName,
                     ExternalId = p1.Coach.ExternalId,
                     Name = p1.Coach.Name,
                     Surname = p1.Coach.Surname,

@@ -25,7 +25,8 @@ namespace Application.Clients
                 ExternalId = p2.ExternalId,
                 Name = p2.Name,
                 Surname = p2.Surname,
-                Phone = p2.Phone
+                Phone = p2.Phone,
+                ImageFileName = p2.ImageFileName
             };
         }
         public ClientViewModel MapToViewModel(Client p3)
@@ -36,7 +37,8 @@ namespace Application.Clients
                 ExternalId = p3.ExternalId,
                 Name = p3.Name,
                 Surname = p3.Surname,
-                Phone = p3.Phone
+                Phone = p3.Phone,
+                ImageFileName = p3.ImageFileName
             };
         }
     }

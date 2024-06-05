@@ -8,7 +8,8 @@ using MediatR;
 
 namespace Application.Users.Handlers
 {
-    internal class ClientCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, IClientMapper clientMapper, IClientService clientService) :
+    internal class ClientCommandsHandler(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, IClientMapper clientMapper, IClientService clientService,
+        IImageService imageService) :
         IRequestHandler<UpdateClientCommand, string>
     {
         public async Task<string> Handle(UpdateClientCommand request, CancellationToken cancellationToken)
@@ -17,19 +18,11 @@ namespace Application.Users.Handlers
 
             if (request.Body.Image != null)
             {
-                var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "SportSchool", "wwwroot", "users");
-                var filePath = Path.Combine(imagesDirectory, $"{client.ExternalId}.jpeg");
-
-                File.Delete(filePath);
-
-                using (Stream fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    request.Body.Image.CopyTo(fileStream);
-                }
+                client.ImageFileName = imageService.SaveUserImage(request.Body.Image, client.ImageFileName);
             }
 
             var httpClient = new HttpClient();
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://identity.chel-sport-school.ru/realms/master/protocol/openid-connect/token");
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/realms/master/protocol/openid-connect/token");
 
             var collection = new List<KeyValuePair<string, string>>
             {
@@ -48,7 +41,7 @@ namespace Application.Users.Handlers
             var token = System.Text.Json.JsonSerializer.Deserialize<Token>(responseString);
 
             
-            httpRequest = new HttpRequestMessage(HttpMethod.Put, $"https://identity.chel-sport-school.ru/admin/realms/SportSchool/users/{client.ExternalId}");
+            httpRequest = new HttpRequestMessage(HttpMethod.Put, $"http://localhost:8080/admin/realms/SportSchool/users/{client.ExternalId}");
             httpRequest.Headers.Add("Authorization", $"Bearer {token!.access_token}");
 
             var jsonString = new StringContent($@"

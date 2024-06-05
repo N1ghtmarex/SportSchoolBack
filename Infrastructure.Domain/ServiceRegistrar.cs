@@ -17,6 +17,7 @@ public static class ServiceRegistrar
         services.AddTransient<ISportService, SportService>();
         services.AddTransient<IRoomService, RoomService>();
         services.AddTransient<ISectionService, SectionService>();
+        services.AddTransient<IImageService, ImageService>();
 
         return services;
     }

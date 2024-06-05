@@ -44,7 +44,8 @@ namespace Application.Coachs
                 .Map(d => d.Qualification, src => src.Qualification)
                 .Map(d => d.Job, src => src.Job)
                 .Map(d => d.JobTitle, src => src.JobTitle)
-                .Map(d => d.JobPeriod, src => src.JobPeriod);
+                .Map(d => d.JobPeriod, src => src.JobPeriod)
+                .Map(d => d.ImageFileName, src => src.ImageFileName);
         }
     }
 }

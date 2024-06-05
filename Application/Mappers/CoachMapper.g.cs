@@ -30,6 +30,7 @@ namespace Application.Coachs
             return p2 == null ? null : new CoachListViewModel()
             {
                 Id = p2.Id,
+                ImageFileName = p2.ImageFileName,
                 ExternalId = p2.ExternalId,
                 Name = p2.Name,
                 Surname = p2.Surname,
@@ -49,6 +50,7 @@ namespace Application.Coachs
             return p3 == null ? null : new CoachViewModel()
             {
                 Id = p3.Id,
+                ImageFileName = p3.ImageFileName,
                 ExternalId = p3.ExternalId,
                 Name = p3.Name,
                 Surname = p3.Surname,

@@ -37,6 +37,7 @@ namespace Application.Events.SectionEvents
                     Coach = p1.Section.Coach == null ? null : new CoachListViewModel()
                     {
                         Id = p1.Section.Coach.Id,
+                        ImageFileName = p1.Section.Coach.ImageFileName,
                         ExternalId = p1.Section.Coach.ExternalId,
                         Name = p1.Section.Coach.Name,
                         Surname = p1.Section.Coach.Surname,

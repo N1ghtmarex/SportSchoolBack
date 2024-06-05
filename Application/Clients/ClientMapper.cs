@@ -28,7 +28,8 @@ namespace Application.Clients
                 .Map(d => d.ExternalId, src => src.ExternalId)
                 .Map(d => d.Name, src => src.Name)
                 .Map(d => d.Surname, src => src.Surname)
-                .Map(d => d.Phone, src => src.Phone);
+                .Map(d => d.Phone, src => src.Phone)
+                .Map(d => d.ImageFileName, src => src.ImageFileName);
         }
     }
 }

@@ -41,6 +41,7 @@ namespace Application.Sections
                 Coach = p2.Coach == null ? null : new CoachListViewModel()
                 {
                     Id = p2.Coach.Id,
+                    ImageFileName = p2.Coach.ImageFileName,
                     ExternalId = p2.Coach.ExternalId,
                     Name = p2.Coach.Name,
                     Surname = p2.Coach.Surname,

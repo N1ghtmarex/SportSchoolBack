@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 namespace Application.Coachs.Handlers
 {
     internal class CoachCommandsHandlers(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ICoachMapper coachMapper, 
-        ICoachService coachService, IClientService clientService) :
+        ICoachService coachService, IClientService clientService, IImageService imageService) :
         IRequestHandler<CreateCoachCommand, CreatedOrUpdatedEntityViewModel<Guid>>, IRequestHandler<UpdateCoachCommand, string>
     {
         public async Task<CreatedOrUpdatedEntityViewModel<Guid>> Handle(CreateCoachCommand request, CancellationToken cancellationToken)
@@ -125,20 +125,12 @@ namespace Application.Coachs.Handlers
             coach.JobTitle = request.Body.JobTitle;
             coach.JobPeriod = request.Body.JobPeriod;
 
-            await dbContext.SaveChangesAsync(cancellationToken);
-
             if (request.Body.Image != null)
             {
-                var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "SportSchool", "wwwroot", "users");
-                var filePath = Path.Combine(imagesDirectory, $"{coach.ExternalId}.jpeg");
-
-                File.Delete(filePath);
-
-                using (Stream fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    request.Body.Image.CopyTo(fileStream);
-                }
+                coach.ImageFileName = imageService.SaveUserImage(request.Body.Image, coach.ImageFileName);
             }
+
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             return "Данные обновлены!";
         }

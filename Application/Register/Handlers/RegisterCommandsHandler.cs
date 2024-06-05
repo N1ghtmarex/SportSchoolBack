@@ -9,6 +9,7 @@ using System.Text.Json;
 using Domain.Entities;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Runtime.ConstrainedExecution;
 
 namespace Application.Register.Handlers
 {
@@ -23,13 +24,13 @@ namespace Application.Register.Handlers
         public required Guid id { get; set; }
     }
 
-    internal class RegisterCommandsHandler(ApplicationDbContext dbContext, IClientMapper clientMapper, IClientService clientService) :
+    internal class RegisterCommandsHandler(ApplicationDbContext dbContext, IClientMapper clientMapper, IClientService clientService, IImageService imageService) :
         IRequestHandler<RegisterUserCommand, CreatedOrUpdatedEntityViewModel<Guid>>
     {
         public async Task<CreatedOrUpdatedEntityViewModel<Guid>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             var httpClient = new HttpClient();
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://identity.chel-sport-school.ru/realms/master/protocol/openid-connect/token");
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/realms/master/protocol/openid-connect/token");
 
             var collection = new List<KeyValuePair<string, string>>
             {
@@ -48,7 +49,7 @@ namespace Application.Register.Handlers
             var token = System.Text.Json.JsonSerializer.Deserialize<Token>(responseString);
 
 
-            httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://identity.chel-sport-school.ru/admin/realms/SportSchool/users");
+            httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/admin/realms/SportSchool/users");
             httpRequest.Headers.Add("Authorization", $"Bearer {token!.access_token}");
 
             
@@ -79,7 +80,7 @@ namespace Application.Register.Handlers
             response.EnsureSuccessStatusCode();
 
 
-            var getUserRequest = new HttpRequestMessage(HttpMethod.Get, $"https://identity.chel-sport-school.ru/admin/realms/SportSchool/users?username={request.Body.Email}");
+            var getUserRequest = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:8080/admin/realms/SportSchool/users?username={request.Body.Email}");
             getUserRequest.Headers.Add("Authorization", $"Bearer {token.access_token}");
 
             response = await httpClient.SendAsync(getUserRequest);
@@ -94,18 +95,14 @@ namespace Application.Register.Handlers
             string userId = firstObject["id"]!.ToString();
 
             var clientToCreate = clientMapper.MapToEntity((request.Body.Name, request.Body.Surname, request.Body.Phone, Guid.Parse(userId)));
-            var createdClient = await dbContext.AddAsync(clientToCreate, cancellationToken);
-            await dbContext.SaveChangesAsync(cancellationToken);
 
             if (request.Body.Image != null)
             {
-                var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "SportSchool", "wwwroot", "users");
-                var filePath = Path.Combine(imagesDirectory, $"{createdClient.Entity.ExternalId.ToString()}.jpeg");
-                using (Stream fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    request.Body.Image.CopyTo(fileStream);
-                }
+                clientToCreate.ImageFileName = imageService.SaveUserImage(request.Body.Image, null);
             }
+
+            var createdClient = await dbContext.AddAsync(clientToCreate, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             return new CreatedOrUpdatedEntityViewModel(createdClient.Entity.Id);
         }
