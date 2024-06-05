@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Application.Coachs.Handlers
 {
-    internal class CoachCommandsHandlers(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ICoachMapper coachMapper, 
+    internal class CoachCommandsHandlers(ApplicationDbContext dbContext, ICurrentHttpContextAccessor contextAccessor, ICoachMapper coachMapper,
         ICoachService coachService, IClientService clientService, IImageService imageService) :
         IRequestHandler<CreateCoachCommand, CreatedOrUpdatedEntityViewModel<Guid>>, IRequestHandler<UpdateCoachCommand, string>
     {
@@ -49,7 +49,7 @@ namespace Application.Coachs.Handlers
             var token = System.Text.Json.JsonSerializer.Deserialize<Token>(responseString);
 
 
-            var addRoleRequest = new HttpRequestMessage(HttpMethod.Post, 
+            var addRoleRequest = new HttpRequestMessage(HttpMethod.Post,
                 $"http://localhost:8080/admin/realms/SportSchool/users/{clientWithSameId.ExternalId}/role-mappings/realm");
             addRoleRequest.Headers.Add("Authorization", $"Bearer {token!.access_token}");
             var addRoleContent = new StringContent($@"
