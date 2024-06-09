@@ -7,7 +7,8 @@ namespace Infrastructure.Domain.Services
     {
         public string SaveUserImage(IFormFile file, string? oldFileName)
         {
-            var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "SportSchool", "wwwroot", "users");
+            //var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "SportSchool", "wwwroot", "users");
+            var imagesDirectory = Path.Combine(Directory.GetParent(Environment.CurrentDirectory)?.ToString() ?? string.Empty, "wwwroot", "users");
             var fileName = $"{Guid.NewGuid()}.jpeg";
             var filePath = Path.Combine(imagesDirectory, fileName);
 
