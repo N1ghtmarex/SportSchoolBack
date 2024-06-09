@@ -1,6 +1,6 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-RUN mkdir app/wwwroot
-RUN chown app/wwwroot
+RUN mkdir /app/wwwroot
+RUN chown /app/wwwroot
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
