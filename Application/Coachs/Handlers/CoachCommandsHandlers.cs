@@ -55,7 +55,7 @@ namespace Application.Coachs.Handlers
             var addRoleContent = new StringContent($@"
             [
                 {{
-                ""id"": ""72ae3bc3-eebb-4148-8584-66888e3681ad"",
+                ""id"": ""66695e29-c054-42f1-b7d2-9f9254d42c14"",
                 ""name"": ""Coach""
                 }}
             ]", null, "application/json");
@@ -67,10 +67,11 @@ namespace Application.Coachs.Handlers
 
 
             var coachToCreate = coachMapper.MapToEntity((request.Body, clientWithSameId.Name, clientWithSameId.Surname, clientWithSameId.Phone));
+            coachToCreate.ImageFileName = clientWithSameId.ImageFileName;
             var createdCoach = await dbContext.AddAsync(coachToCreate, cancellationToken);
 
             dbContext.Remove(clientWithSameId);
-
+            
             await dbContext.SaveChangesAsync();
 
             return new CreatedOrUpdatedEntityViewModel(createdCoach.Entity.Id);

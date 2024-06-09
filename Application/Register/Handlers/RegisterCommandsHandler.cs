@@ -30,7 +30,8 @@ namespace Application.Register.Handlers
         public async Task<CreatedOrUpdatedEntityViewModel<Guid>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             var httpClient = new HttpClient();
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/realms/master/protocol/openid-connect/token");
+            //var httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/realms/master/protocol/openid-connect/token");
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://identity.chel-sport-school.ru/realms/master/protocol/openid-connect/token");
 
             var collection = new List<KeyValuePair<string, string>>
             {
@@ -49,7 +50,8 @@ namespace Application.Register.Handlers
             var token = System.Text.Json.JsonSerializer.Deserialize<Token>(responseString);
 
 
-            httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/admin/realms/SportSchool/users");
+            //httpRequest = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/admin/realms/SportSchool/users");
+            httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://identity.chel-sport-school.ru/admin/realms/SportSchool/users");
             httpRequest.Headers.Add("Authorization", $"Bearer {token!.access_token}");
 
             
@@ -80,7 +82,8 @@ namespace Application.Register.Handlers
             response.EnsureSuccessStatusCode();
 
 
-            var getUserRequest = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:8080/admin/realms/SportSchool/users?username={request.Body.Email}");
+            //var getUserRequest = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:8080/admin/realms/SportSchool/users?username={request.Body.Email}");
+            var getUserRequest = new HttpRequestMessage(HttpMethod.Get, $"https://identity.chel-sport-school.ru/admin/realms/SportSchool/users?username={request.Body.Email}");
             getUserRequest.Headers.Add("Authorization", $"Bearer {token.access_token}");
 
             response = await httpClient.SendAsync(getUserRequest);

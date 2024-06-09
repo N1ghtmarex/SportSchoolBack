@@ -65,6 +65,7 @@ namespace Application.Events.SectionEvents.Handlers
             }
 
             var sectionEventsInThisTime = await dbContext.SectionEvents
+                .Where(x => x.Section.CoachId == coach.Id)
                 .Where(x => x.DayOfWeek == request.Body.DayOfWeek)
                 .Where(x => x.Period >= DateOnly.FromDateTime(DateTime.Today) && x.Period >= period)
                 .Where(x => x.StartTime >= endTime || x.EndTime >= startTime)
